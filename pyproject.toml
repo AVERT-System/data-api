@@ -1,0 +1,50 @@
+[build-system]
+requires = ["wheel", "setuptools >= 61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["avert_api*"]
+
+[project]
+name = "avert_api"
+version = "0.0.1"
+description = "A ReSTful API for accessing/managing volcanic data."
+readme = "README.md"
+license = {text = "GPLv3"}
+requires-python = ">=3.11"
+authors = [{name = "The AVERT System Team", email = "avert-system@proton.me"}]
+maintainers = [{name = "Conor Bacon", email = "cbacon@ldeo.columbia.edu"}]
+keywords = ["volcanology", "data", "science", "instrumentation", "web", "api", "imagery"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Natural Language :: English",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "connexion[swagger-ui]",
+    "flask",
+    "Flask-SQLAlchemy",
+    "flask-marshmallow",
+    "marshmallow-sqlalchemy",
+    "mod_wsgi",
+    "python-dotenv",
+    "requests",
+]
+
+[project.scripts]
+avert-api = "avert_api.manager:main"
+
+[project.optional-dependencies]
+dev = ["black", "ipython"]
+docs = ["Sphinx >= 1.8.1", "docutils"]
+
+[project.urls]
+GitHub = "https://github.com/AVERT-System/AVERT-api"
+Issues = "https://github.com/AVERT-System/AVERT-api/issues"
+
+[tool.black]
+line-length = 88

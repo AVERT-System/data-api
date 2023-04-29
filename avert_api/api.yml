@@ -1,0 +1,266 @@
+swagger: "2.0"
+info:
+  description: Defines endpoints for the AVERT Data API.
+  version: "0.0.1"
+  title: AVERT Data API
+consumes:
+  - application/json
+produces:
+  - application/json
+basePath: /api
+
+# Paths supported by the server application
+paths:
+  # Get all IR images
+  /imagery/infrared/query:
+    get:
+      operationId: avert_api.imagery.infrared.query
+      tags:
+        - infrared-imagery
+      summary: Query the infrared image database
+      description: Query the infrared image database
+      parameters:
+        - name: download
+          in: query
+          description: Whether to download the files or return a JSON of query results
+          type: string
+          required: False
+        - name: search_from
+          in: query
+          description: Start time of images of interest
+          type: string
+          required: False
+        - name: search_to
+          in: query
+          description: End time of images of interest
+          type: string
+          required: False
+        - name: quality
+          in: query
+          description: Image quality as mapped to a classification number
+          type: integer
+          required: False
+        - name: site
+          in: query
+          description: Name of camera site
+          type: string
+          required: False
+        - name: vnum
+          in: query
+          description: Volcano identification code for camera site
+          type: string
+          required: False
+      responses:
+        200:
+          description: Image retrieval successful
+          schema:
+            type: object
+            properties:
+              image_id:
+                type: string
+                description: Image ID, based on the image's timestamp
+              url:
+                type: string
+                description: Path to image on the local server
+
+  # Get and view/download specific infrared spectrum image
+  /imagery/infrared/r/{image_id}:
+    get:
+      operationId: avert_api.imagery.infrared.retrieve_image
+      tags:
+        - infrared-imagery
+      summary: Retrieve one image from the infrared imagery database
+      description: Retrieve one image from the infrared imagery database
+      parameters:
+        - name: image_id
+          in: path
+          description: Image ID (based on timestamp of image)
+          type: string
+          required: True
+        - name: download
+          in: query
+          description: Whether to download the file or simply display it
+          type: string
+          required: False
+      responses:
+        200:
+          description: Successfully retrieved image from database operation
+          schema:
+            type: object
+            properties:
+              image_id:
+                type: string
+                description: Image ID, based on the image's timestamp
+              url:
+                type: string
+                description: Path to image on the AVERT server
+
+  # Delete specific IR image
+  /admin/imagery/infrared/d/{image_id}:
+    delete:
+      operationId: avert_api.imagery.infrared.delete
+      tags:
+        - infrared-imagery
+      summary: Delete an image from the infrared imagery database
+      description: Delete an image from the infrared imagery database
+      parameters:
+        - name: image_id
+          in: path
+          type: string
+          required: True
+      responses:
+        200:
+          description: Successfully deleted an image from the database
+
+  # Post new IR image
+  /admin/imagery/infrared/c:
+    post:
+      operationId: avert_api.imagery.infrared.create
+      tags:
+        - infrared-imagery
+      summary: Add an image to the infrared imagery database
+      description: Add an image to the infrared imagery database
+      parameters:
+        - name: image
+          in: body
+          description: Image to add
+          required: True
+          schema:
+            type: object
+            properties:
+              image_id:
+                type: string
+                description: Image ID, based on the image's timestamp
+              url:
+                type: string
+                description: Path to image on the local server
+      responses:
+        201:
+          description: Successfully added image to database
+
+  # Get all VS images
+  /imagery/visible/query:
+    get:
+      operationId: avert_api.imagery.visible.query
+      tags:
+        - visible-imagery
+      summary: Query the visible image database
+      description: Query the visible image database
+      parameters:
+        - name: download
+          in: query
+          description: Whether to download the files or return a JSON of query results
+          type: string
+          required: False
+        - name: search_from
+          in: query
+          description: Start time of images of interest
+          type: string
+          required: False
+        - name: search_to
+          in: query
+          description: End time of images of interest
+          type: string
+          required: False
+        - name: quality
+          in: query
+          description: Image quality as mapped to a classification number
+          type: integer
+          required: False
+        - name: site
+          in: query
+          description: Name of camera site
+          type: string
+          required: False
+        - name: vnum
+          in: query
+          description: Volcano identification code for camera site
+          type: string
+          required: False
+      responses:
+        200:
+          description: Successfully retrieved image from database operation
+          schema:
+            type: object
+            properties:
+              image_id:
+                type: string
+                description: Image ID, based on the image's timestamp
+              url:
+                type: string
+                description: Path to image on the local server
+
+  # Get and view/download specific visible spectrum image
+  /imagery/visible/r/{image_id}:
+    get:
+      operationId: avert_api.imagery.visible.retrieve_image
+      tags:
+        - visible-imagery
+      summary: Retrieve one image from the visible imagery database
+      description: Retrieve one image from the visible imagery database
+      parameters:
+        - name: image_id
+          in: path
+          description: Image ID (based on timestamp of image)
+          type: string
+          required: True
+        - name: download
+          in: query
+          description: Whether to download the file or simply display it
+          type: string
+          required: False
+      responses:
+        200:
+          description: Successfully retrieved image from database operation
+          schema:
+            type: object
+            properties:
+              image_id:
+                type: string
+                description: Image ID, based on the image's timestamp
+              url:
+                type: string
+                description: Path to image on the local server
+
+  # Delete specific VS image
+  /admin/imagery/visible/d/{image_id}:
+    delete:
+      operationId: avert_api.imagery.visible.delete
+      tags:
+        - visible-imagery
+      summary: Delete an image from the visible imagery database
+      description: Delete an image from the visible imagery database
+      parameters:
+        - name: image_id
+          in: path
+          type: string
+          required: True
+      responses:
+        200:
+          description: Successfully deleted an image from the database
+
+  # Post new VS image
+  /admin/imagery/visible/c:
+    post:
+      operationId: avert_api.imagery.visible.create
+      tags:
+        - visible-imagery
+      summary: Add an image to the visible imagery database
+      description: Add an image to the visible imagery database
+      parameters:
+        - name: image
+          in: body
+          description: Image to add
+          required: True
+          schema:
+            type: object
+            properties:
+              image_id:
+                type: string
+                description: Image ID, based on the image's timestamp
+              url:
+                type: string
+                description: Path to image on the local server
+      responses:
+        201:
+          description: Successfully added image to database
