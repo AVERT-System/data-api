@@ -1,1 +1,3 @@
-include .flaskenv
+include avert_api/.flaskenv
+include avert_api/.env
+include avert_api/api.yml

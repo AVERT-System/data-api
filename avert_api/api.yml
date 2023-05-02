@@ -7,7 +7,7 @@ consumes:
   - application/json
 produces:
   - application/json
-basePath: /api
+basePath: /
 
 # Paths supported by the server application
 paths:
@@ -49,6 +49,16 @@ paths:
           in: query
           description: Volcano identification code for camera site
           type: string
+          required: False
+        - name: page
+          in: query
+          description: Current page for pagination
+          type: integer
+          required: False
+        - name: image_count
+          in: query
+          description: Number of images per page
+          type: integer
           required: False
       responses:
         200:
@@ -176,6 +186,16 @@ paths:
           in: query
           description: Volcano identification code for camera site
           type: string
+          required: False
+        - name: page
+          in: query
+          description: Current page for pagination
+          type: integer
+          required: False
+        - name: image_count
+          in: query
+          description: Number of images per page
+          type: integer
           required: False
       responses:
         200:

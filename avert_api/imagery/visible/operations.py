@@ -162,14 +162,18 @@ def query(**kwargs) -> Response:
         else:
             images = images.filter(getattr(Image, key) == value)
 
-    images = images.all()
+    if kwargs.get("page") is not None:
+        images = images.paginate(
+            page=kwargs.get("page", 1),
+            per_page=kwargs.get("image_count", 12)
+        )
+        return ImageSchema(many=True).dump(images.items)
 
     if kwargs.get("download") is None:
-        # Dump contents of database matching requested filters
-        return ImageSchema(many=True).dump(images)
+        return ImageSchema(many=True).dump(images.all())
 
     # Set a maximum number of images?
-    if len(images) > 100:
+    if images.count() > 100:
         print("Many images - try a more specific query!")
 
     # Build .zip file with all files that match these criteria
