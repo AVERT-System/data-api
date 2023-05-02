@@ -10,7 +10,7 @@ Spin up the imagery API.
 
 """
 
-from imagery_api import init_app
+from avert_api import init_app
 
 
 application = init_app()
