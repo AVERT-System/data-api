@@ -11,7 +11,9 @@ The API can be installed by cloning this repository and running `pip install .` 
 Once installed, the API is configured with a pair of Dotenv files: `.env`, which contains PRIVATE information; and `.flaskenv`, which contains PUBLIC information. Edit the examples accordingly and add copies to the `avert_api` directory, then reinstall the package. Make sure the contents of the `.env` file is never commited to a remote repository, or placed somewhere it could be accessed.
 
 ## Futures
-he database model is not finalised and will likely see extensive alteration to fully specify the data and related metadata.
+The database model is not finalised and will likely see some alteration to fully specify the data and related metadata.
+
+Add the option to run a containerised version of the API, for deployment on cloud platforms.
 
 ## Contact
 You can contact us directly at: avert-system [ at ] proton.me
