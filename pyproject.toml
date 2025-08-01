@@ -13,7 +13,7 @@ readme = "README.md"
 license = {text = "GPLv3"}
 requires-python = ">=3.11"
 authors = [{name = "The AVERT System Team", email = "avert-system@proton.me"}]
-maintainers = [{name = "Conor Bacon", email = "cbacon@ldeo.columbia.edu"}]
+maintainers = [{name = "Conor Bacon", email = "cbacon@ldeo.columbia.edu"}, {name = "Hansaem Park", email = "hpark@ldeo.columbia.edu"}]
 keywords = ["volcanology", "data", "science", "instrumentation", "web", "api", "imagery"]
 classifiers = [
     "Development Status :: 3 - Alpha",
