@@ -130,7 +130,7 @@ def retrieve_image(image_id: str, download=None) -> any:
 
 def query(**kwargs) -> Response:
     """
-    Handler for GET requests to the '/api/visible/r' endpoint.
+    Handler for GET requests to the '/api/imagery/visible/query' endpoint.
 
     By default, the images are delivered within the response JSON payload. There is an
     option to download the images directly to the local file storage system as a zipped
@@ -138,18 +138,26 @@ def query(**kwargs) -> Response:
 
     Parameters
     ----------
-    image_id: ID of the image to retrieve from the database.
-    download: Toggle to also download the image.
+    **kwargs: Query parameters including:
+        - site: Site identifier
+        - vnum: Volcano number
+        - search_from: Start time for search
+        - search_to: End time for search
+        - quality: Image quality filter
+        - page: Page number for pagination
+        - image_count: Images per page
+        - limit: Maximum number of results to return (new parameter)
+        - download: Whether to download as ZIP file
 
     Returns
     -------
-    zip: JSON payload containing the requested image.
-
+    Response: JSON payload containing the requested images or ZIP file if download=true
     """
 
     images = Image.query
     available_keys = Image.__table__.columns.keys()
-    available_keys.extend(["search_from", "search_to"])
+    available_keys.extend(["search_from", "search_to", "limit"])
+
     for key, value in kwargs.items():
         if key not in available_keys:
             continue
@@ -159,36 +167,51 @@ def query(**kwargs) -> Response:
         elif key == "search_to":
             filter_time = dt.strptime(value, "%Y-%m-%dT%H:%M")
             images = images.filter(getattr(Image, "timestamp") < filter_time)
+        elif key == "limit":
+            images = images.limit(int(value))
         else:
             images = images.filter(getattr(Image, key) == value)
 
     if kwargs.get("page") is not None:
         images = images.paginate(
-            page=kwargs.get("page", 1),
-            per_page=kwargs.get("image_count", 12)
+            page=kwargs.get("page", 1), per_page=kwargs.get("image_count", 12)
         )
         return ImageSchema(many=True).dump(images.items)
 
-    if kwargs.get("download") is None:
+    # Handle download parameter - only return ZIP if explicitly requested
+    download_requested = kwargs.get("download")
+
+    # Default behavior: return JSON
+    if download_requested is None or download_requested == "false":
+        if kwargs.get("limit"):
+            images = images.limit(int(kwargs.get("limit")))
         return ImageSchema(many=True).dump(images.all())
 
-    # Set a maximum number of images?
-    if images.count() > 100:
-        print("Many images - try a more specific query!")
-
-    # Build .zip file with all files that match these criteria
-    memory_file = io.BytesIO()
-    with zipfile.ZipFile(memory_file, "w") as zf:
-        for image in images[:100]:
-            # Do some sort of time-stamping here?
-            arcname = (
-                f"avert_imagery_request/{image.vnum}/"
-                f"{image.site}/{image.image_id}.jpg"
+    # Only create ZIP if download=true is explicitly set
+    if download_requested == "true":
+        # Check if too many images for ZIP download
+        image_count = images.count()
+        if image_count > 100:
+            abort(
+                400,
+                f"Too many images ({image_count}) for ZIP download. Maximum is 100. Use a more specific query or set limit parameter.",
             )
-            zf.write(image.url, arcname=arcname)
-    memory_file.seek(0)
 
-    return send_file(memory_file, download_name="images.zip", as_attachment=True)
+        # Build .zip file with all files that match these criteria
+        memory_file = io.BytesIO()
+        with zipfile.ZipFile(memory_file, "w") as zf:
+            for image in images[:100]:
+                arcname = (
+                    f"avert_imagery_request/{image.vnum}/"
+                    f"{image.site}/{image.image_id}.jpg"
+                )
+                zf.write(image.url, arcname=arcname)
+        memory_file.seek(0)
+
+        return send_file(memory_file, download_name="images.zip", as_attachment=True)
+
+    # Fallback: return JSON
+    return ImageSchema(many=True).dump(images.all())
 
 
 def update(image_id: str, image: Image) -> int:

@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   description: Defines endpoints for the AVERT Data API.
-  version: "0.0.1"
+  version: "0.0.2"
   title: AVERT Data API
 consumes:
   - application/json
@@ -18,23 +18,26 @@ paths:
       tags:
         - infrared-imagery
       summary: Query the infrared image database
-      description: Query the infrared image database
+      description: Query the infrared image database. Returns JSON metadata by default. Use download=true to get ZIP file (max 100 images).
       parameters:
         - name: download
           in: query
-          description: Whether to download the files or return a JSON of query results
+          description: "Whether to download the files as ZIP or return JSON metadata (default: false)"
           type: string
-          required: False
+          required: false
+          enum:
+            - "true"
+            - "false"
         - name: search_from
           in: query
-          description: Start time of images of interest
+          description: "Start time of images of interest (ISO 8601 format: YYYY-MM-DDTHH:MM)"
           type: string
-          required: False
+          required: false
         - name: search_to
           in: query
-          description: End time of images of interest
+          description: "End time of images of interest (ISO 8601 format: YYYY-MM-DDTHH:MM)"
           type: string
-          required: False
+          required: false
         - name: quality
           in: query
           description: Image quality as mapped to a classification number
@@ -50,6 +53,11 @@ paths:
           description: Volcano identification code for camera site
           type: string
           required: False
+        - name: limit
+          in: query
+          description: Maximum number of results to return
+          type: integer
+          required: False
         - name: page
           in: query
           description: Current page for pagination
@@ -64,14 +72,40 @@ paths:
         200:
           description: Image retrieval successful
           schema:
-            type: object
-            properties:
-              image_id:
-                type: string
-                description: Image ID, based on the image's timestamp
-              url:
-                type: string
-                description: Path to image on the local server
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: Database ID of the image record
+                image_id:
+                  type: string
+                  description: Image ID, based on the image's timestamp
+                site:
+                  type: string
+                  description: Site identifier
+                vnum:
+                  type: integer
+                  description: Volcano number identifier
+                timestamp:
+                  type: string
+                  format: date-time
+                  description: When the image was captured
+                file_format:
+                  type: string
+                  description: Image file format
+                url:
+                  type: string
+                  description: Path to image on the local server
+                frame:
+                  type: integer
+                  description: Frame number for video sequences
+                quality:
+                  type: integer
+                  description: Image quality indicator
+        400:
+          description: Bad request - invalid parameters or too many images for ZIP download
 
   # Get and view/download specific infrared spectrum image
   /imagery/infrared/r/{image_id}:
@@ -155,13 +189,16 @@ paths:
       tags:
         - visible-imagery
       summary: Query the visible image database
-      description: Query the visible image database
+      description: Query the visible image database. Returns JSON metadata by default. Use download=true to get ZIP file (max 100 images).
       parameters:
         - name: download
           in: query
-          description: Whether to download the files or return a JSON of query results
+          description: "Whether to download the files as ZIP or return JSON metadata (default: false)"
           type: string
-          required: False
+          required: false
+          enum:
+            - "true"
+            - "false"
         - name: search_from
           in: query
           description: Start time of images of interest
@@ -187,6 +224,11 @@ paths:
           description: Volcano identification code for camera site
           type: string
           required: False
+        - name: limit
+          in: query
+          description: Maximum number of results to return
+          type: integer
+          required: False
         - name: page
           in: query
           description: Current page for pagination
@@ -199,16 +241,42 @@ paths:
           required: False
       responses:
         200:
-          description: Successfully retrieved image from database operation
+          description: Image retrieval successful
           schema:
-            type: object
-            properties:
-              image_id:
-                type: string
-                description: Image ID, based on the image's timestamp
-              url:
-                type: string
-                description: Path to image on the local server
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: Database ID of the image record
+                image_id:
+                  type: string
+                  description: Image ID, based on the image's timestamp
+                site:
+                  type: string
+                  description: Site identifier
+                vnum:
+                  type: integer
+                  description: Volcano number identifier
+                timestamp:
+                  type: string
+                  format: date-time
+                  description: When the image was captured
+                file_format:
+                  type: string
+                  description: Image file format
+                url:
+                  type: string
+                  description: Path to image on the local server
+                frame:
+                  type: integer
+                  description: Frame number for video sequences
+                quality:
+                  type: integer
+                  description: Image quality indicator
+        400:
+          description: Bad request - invalid parameters or too many images for ZIP download
 
   # Get and view/download specific visible spectrum image
   /imagery/visible/r/{image_id}:
