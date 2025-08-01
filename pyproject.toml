@@ -7,7 +7,7 @@ include = ["avert_api*"]
 
 [project]
 name = "avert_api"
-version = "0.0.1"
+version = "0.0.2"
 description = "A ReSTful API for accessing/managing volcanic data."
 readme = "README.md"
 license = {text = "GPLv3"}
